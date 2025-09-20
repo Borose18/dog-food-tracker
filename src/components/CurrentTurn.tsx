@@ -26,7 +26,7 @@ export default function CurrentTurn({ currentMember, nextMember }: CurrentTurnPr
         <div className="bg-gradient-to-r from-purple-500/20 to-blue-500/20 rounded-xl p-4 border border-white/20">
           <div className="flex items-center gap-3 mb-2">
             <div className={`w-6 h-6 rounded-full ${currentMember.color}`} />
-            <span className="text-white/70 text-sm">It's your turn to buy</span>
+            <span className="text-white/70 text-sm">It&apos;s your turn to buy</span>
           </div>
           <h3 className="text-xl font-bold text-white">{currentMember.name}</h3>
         </div>

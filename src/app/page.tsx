@@ -22,7 +22,6 @@ export default function Home() {
   const wetFoodCurrentMember = state.familyMembers[state.wetFoodCurrentIndex];
   const dryFoodCurrentMember = state.familyMembers[state.dryFoodCurrentIndex];
   const wetFoodNextMember = state.familyMembers[(state.wetFoodCurrentIndex + 1) % state.familyMembers.length];
-  const dryFoodNextMember = state.familyMembers[(state.dryFoodCurrentIndex + 1) % state.familyMembers.length];
   
   // Keep backward compatibility for CurrentTurn component
   const currentMember = wetFoodCurrentMember; // Default to wet food for main display

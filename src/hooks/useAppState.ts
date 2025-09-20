@@ -39,7 +39,7 @@ export const useAppState = () => {
       try {
         const parsed = JSON.parse(savedState);
         // Convert date strings back to Date objects
-        parsed.purchases = parsed.purchases.map((p: any) => ({
+        parsed.purchases = parsed.purchases.map((p: Purchase) => ({
           ...p,
           date: new Date(p.date),
         }));

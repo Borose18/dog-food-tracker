@@ -181,7 +181,7 @@ export const useSupabaseAppState = () => {
     }
   }, []);
 
-  const recordPurchase = useCallback(async (foodType: 'wet' | 'dry', amount?: number) => {
+  const recordPurchase = useCallback(async (foodType: 'wet' | 'dry') => {
     try {
       setError(null);
       const currentIndex = foodType === 'wet' ? state.wetFoodCurrentIndex : state.dryFoodCurrentIndex;
