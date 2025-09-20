@@ -1,5 +1,6 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { useSupabaseAppState } from '@/hooks/useSupabaseAppState';
 import { useAppState } from '@/hooks/useAppState';
 import { isSupabaseConfigured } from '@/lib/supabase';
@@ -11,6 +12,8 @@ import PurchaseHistory from '@/components/PurchaseHistory';
 import TurnAdjuster from '@/components/TurnAdjuster';
 
 export default function Home() {
+  const router = useRouter();
+  
   // Use Supabase if configured, otherwise fall back to localStorage
   const supabaseHook = useSupabaseAppState();
   const localStorageHook = useAppState();
@@ -52,7 +55,7 @@ export default function Home() {
             <h2 className="text-xl font-bold text-white mb-2">Connection Error</h2>
             <p className="text-white/70 mb-4">{error}</p>
             <button
-              onClick={() => window.location.reload()}
+              onClick={() => router.refresh()}
               className="px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg transition-colors"
             >
               Retry
