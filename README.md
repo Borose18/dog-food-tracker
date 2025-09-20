@@ -149,3 +149,5 @@ If you encounter any issues:
 ---
 
 **Happy Dog Food Tracking! 🐕✨**
+
+<!-- Trigger deploy after adding Netlify environment variables -->
