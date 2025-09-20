@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { familyMembersAPI, purchasesAPI, rotationStateAPI } from '@/lib/database';
 import { realtimeManager } from '@/lib/realtime';
 import { AppState, FamilyMember, Purchase, dbToAppTypes } from '@/types';
-import { FamilyMemberDB, PurchaseDB, RotationStateDB } from '@/types/database';
+import { PurchaseDB } from '@/types/database';
 
 export const useSupabaseAppState = () => {
   const [state, setState] = useState<AppState>({
@@ -78,73 +78,37 @@ export const useSupabaseAppState = () => {
 
     // Subscribe to real-time updates
     realtimeManager.subscribeToAll(
-      (payload) => {
-        // Handle family members updates
-        if (payload.table === 'family_members') {
-          if (payload.eventType === 'INSERT') {
-            const newMember = dbToAppTypes.familyMember(payload.new as FamilyMemberDB);
-            setState(prev => ({
-              ...prev,
-              familyMembers: [...prev.familyMembers, newMember],
-            }));
-          } else if (payload.eventType === 'UPDATE') {
-            const updatedMember = dbToAppTypes.familyMember(payload.new as FamilyMemberDB);
-            setState(prev => ({
-              ...prev,
-              familyMembers: prev.familyMembers.map(member => 
-                member.id === updatedMember.id ? updatedMember : member
-              ),
-            }));
-          } else if (payload.eventType === 'DELETE') {
-            setState(prev => ({
-              ...prev,
-              familyMembers: prev.familyMembers.filter(member => member.id !== payload.old.id),
-            }));
-          }
-        }
-
-        // Handle purchases updates
-        if (payload.table === 'purchases') {
-          if (payload.eventType === 'INSERT') {
-            const newPurchase = dbToAppTypes.purchase(payload.new as PurchaseDB & { family_members?: { name: string } });
-            setState(prev => ({
-              ...prev,
-              purchases: [...prev.purchases, newPurchase],
-            }));
-          } else if (payload.eventType === 'UPDATE') {
-            const updatedPurchase = dbToAppTypes.purchase(payload.new as PurchaseDB & { family_members?: { name: string } });
-            setState(prev => ({
-              ...prev,
-              purchases: prev.purchases.map(purchase => 
-                purchase.id === updatedPurchase.id ? updatedPurchase : purchase
-              ),
-            }));
-          } else if (payload.eventType === 'DELETE') {
-            setState(prev => ({
-              ...prev,
-              purchases: prev.purchases.filter(purchase => purchase.id !== payload.old.id),
-            }));
-          }
-        }
-
-        // Handle rotation state updates
-        if (payload.table === 'rotation_state') {
-          setState(prev => ({
-            ...prev,
-            currentTurnIndex: payload.new.wet_food_current_index,
-            wetFoodCurrentIndex: payload.new.wet_food_current_index,
-            dryFoodCurrentIndex: payload.new.dry_food_current_index,
-            isSetupComplete: payload.new.is_setup_complete,
-            // Keep existing turnsLocked state - don't reset it
-            wetFoodStatus: dbToAppTypes.foodStatus('wet', payload.new as RotationStateDB, prev.familyMembers),
-            dryFoodStatus: dbToAppTypes.foodStatus('dry', payload.new as RotationStateDB, prev.familyMembers),
-          }));
-        }
+      // Family members callback
+      (familyMembers) => {
+        setState(prev => ({
+          ...prev,
+          familyMembers: familyMembers.map(dbToAppTypes.familyMember),
+        }));
+      },
+      // Purchases callback
+      (purchases) => {
+        setState(prev => ({
+          ...prev,
+          purchases: purchases.map(p => dbToAppTypes.purchase(p as PurchaseDB & { family_members?: { name: string } })),
+        }));
+      },
+      // Rotation state callback
+      (rotationState) => {
+        setState(prev => ({
+          ...prev,
+          currentTurnIndex: rotationState.wet_food_current_index,
+          wetFoodCurrentIndex: rotationState.wet_food_current_index,
+          dryFoodCurrentIndex: rotationState.dry_food_current_index,
+          isSetupComplete: rotationState.is_setup_complete,
+          // Keep existing turnsLocked state - don't reset it
+          wetFoodStatus: dbToAppTypes.foodStatus('wet', rotationState, prev.familyMembers),
+          dryFoodStatus: dbToAppTypes.foodStatus('dry', rotationState, prev.familyMembers),
+        }));
       }
     );
 
     return () => {
-      realtimeManager.unsubscribeFromAll();
+      realtimeManager.unsubscribeAll();
     };
   }, [loadData]);
 

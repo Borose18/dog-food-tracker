@@ -9,7 +9,7 @@ export const isSupabaseConfigured = !!(supabaseUrl && supabaseAnonKey);
 
 // Create Supabase client only if configured
 export const supabase = isSupabaseConfigured 
-  ? createClient<Database>(supabaseUrl, supabaseAnonKey, {
+  ? createClient<Database>(supabaseUrl!, supabaseAnonKey!, {
       realtime: {
         params: {
           eventsPerSecond: 10,
@@ -50,7 +50,7 @@ export const createInitialRotationState = async () => {
       wet_food_days_between: 7,
       dry_food_days_between: 7,
       is_setup_complete: false,
-    })
+    } as any)
     .select()
     .single();
 

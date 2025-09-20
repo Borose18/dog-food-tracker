@@ -35,13 +35,14 @@ export class RealtimeManager {
         },
         async () => {
           // Fetch updated data when changes occur
+          if (!supabase) return;
           const { data, error } = await supabase
             .from('family_members')
             .select('*')
             .order('created_at', { ascending: true });
 
           if (!error && data) {
-            callback(data);
+            callback(data as unknown as FamilyMemberDB[]);
           }
         }
       )
@@ -75,6 +76,7 @@ export class RealtimeManager {
         },
         async () => {
           // Fetch updated data when changes occur
+          if (!supabase) return;
           const { data, error } = await supabase
             .from('purchases')
             .select(`
@@ -84,7 +86,7 @@ export class RealtimeManager {
             .order('purchase_date', { ascending: false });
 
           if (!error && data) {
-            callback(data);
+            callback(data as unknown as PurchaseDB[]);
           }
         }
       )
@@ -118,13 +120,14 @@ export class RealtimeManager {
         },
         async () => {
           // Fetch updated data when changes occur
+          if (!supabase) return;
           const { data, error } = await supabase
             .from('rotation_state')
             .select('*')
             .single();
 
           if (!error && data) {
-            callback(data);
+            callback(data as unknown as RotationStateDB);
           }
         }
       )
@@ -148,7 +151,7 @@ export class RealtimeManager {
   // Unsubscribe from a specific channel
   unsubscribe(channelName: string) {
     const channel = this.channels.get(channelName);
-    if (channel) {
+    if (channel && supabase) {
       supabase.removeChannel(channel);
       this.channels.delete(channelName);
     }
@@ -156,9 +159,11 @@ export class RealtimeManager {
 
   // Unsubscribe from all channels
   unsubscribeAll() {
-    this.channels.forEach((channel) => {
-      supabase.removeChannel(channel);
-    });
+    if (supabase) {
+      this.channels.forEach((channel) => {
+        supabase!.removeChannel(channel);
+      });
+    }
     this.channels.clear();
   }
 

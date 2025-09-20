@@ -21,52 +21,52 @@ export const familyMembersAPI = {
   getAll: async (): Promise<FamilyMemberDB[]> => {
     checkSupabaseConfig();
 
-    const { data, error } = await supabase
+    const { data, error } = await supabase!
       .from('family_members')
       .select('*')
       .order('created_at', { ascending: true });
 
     if (error) throw error;
-    return data || [];
+    return (data as unknown as FamilyMemberDB[]) || [];
   },
 
   // Add a new family member
   create: async (member: FamilyMemberInsert): Promise<FamilyMemberDB> => {
     checkSupabaseConfig();
 
-    const { data, error } = await supabase
+    const { data, error } = await supabase!
       .from('family_members')
-      .insert(member)
+      .insert(member as any)
       .select()
       .single();
 
     if (error) throw error;
-    return data;
+    return data as unknown as FamilyMemberDB;
   },
 
   // Update a family member
   update: async (id: string, updates: Partial<FamilyMemberInsert>): Promise<FamilyMemberDB> => {
     checkSupabaseConfig();
 
-    const { data, error } = await supabase
+    const { data, error } = await supabase!
       .from('family_members')
-      .update(updates)
-      .eq('id', id)
+      .update(updates as never)
+      .eq('id', id as any)
       .select()
       .single();
 
     if (error) throw error;
-    return data;
+    return data as unknown as FamilyMemberDB;
   },
 
   // Delete a family member
   delete: async (id: string): Promise<void> => {
     checkSupabaseConfig();
 
-    const { error } = await supabase
+    const { error } = await supabase!
       .from('family_members')
       .delete()
-      .eq('id', id);
+      .eq('id', id as any);
 
     if (error) throw error;
   },
@@ -78,7 +78,7 @@ export const purchasesAPI = {
   getAll: async (): Promise<PurchaseDB[]> => {
     checkSupabaseConfig();
 
-    const { data, error } = await supabase
+    const { data, error } = await supabase!
       .from('purchases')
       .select(`
         *,
@@ -87,48 +87,48 @@ export const purchasesAPI = {
       .order('purchase_date', { ascending: false });
 
     if (error) throw error;
-    return data || [];
+    return (data as unknown as PurchaseDB[]) || [];
   },
 
   // Get purchases by family member
   getByFamilyMember: async (familyMemberId: string): Promise<PurchaseDB[]> => {
     checkSupabaseConfig();
 
-    const { data, error } = await supabase
+    const { data, error } = await supabase!
       .from('purchases')
       .select(`
         *,
         family_members!inner(name)
       `)
-      .eq('family_member_id', familyMemberId)
+      .eq('family_member_id', familyMemberId as any)
       .order('purchase_date', { ascending: false });
 
     if (error) throw error;
-    return data || [];
+    return (data as unknown as PurchaseDB[]) || [];
   },
 
   // Create a new purchase
   create: async (purchase: PurchaseInsert): Promise<PurchaseDB> => {
     checkSupabaseConfig();
 
-    const { data, error } = await supabase
+    const { data, error } = await supabase!
       .from('purchases')
-      .insert(purchase)
+      .insert(purchase as any)
       .select()
       .single();
 
     if (error) throw error;
-    return data;
+    return data as unknown as PurchaseDB;
   },
 
   // Delete a purchase
   delete: async (id: string): Promise<void> => {
     checkSupabaseConfig();
 
-    const { error } = await supabase
+    const { error } = await supabase!
       .from('purchases')
       .delete()
-      .eq('id', id);
+      .eq('id', id as any);
 
     if (error) throw error;
   },
@@ -146,7 +146,7 @@ export const rotationStateAPI = {
       state = await createInitialRotationState();
     }
     
-    return state;
+    return state as unknown as RotationStateDB;
   },
 
   // Update rotation state
@@ -154,7 +154,7 @@ export const rotationStateAPI = {
     checkSupabaseConfig();
 
     // First get the existing rotation state to get its ID
-    const { data: existingState, error: fetchError } = await supabase
+    const { data: existingState, error: fetchError } = await supabase!
       .from('rotation_state')
       .select('id')
       .single();
@@ -162,16 +162,19 @@ export const rotationStateAPI = {
     if (fetchError) throw fetchError;
     if (!existingState) throw new Error('No rotation state found');
 
+    // Type assertion to help TypeScript understand existingState is not an error
+    const stateId = (existingState as { id: string }).id;
+
     // Update the rotation state by ID
-    const { data, error } = await supabase
+    const { data, error } = await supabase!
       .from('rotation_state')
-      .update(updates)
-      .eq('id', existingState.id)
+      .update(updates as never)
+      .eq('id', stateId as any)
       .select()
       .single();
 
     if (error) throw error;
-    return data;
+    return data as unknown as RotationStateDB;
   },
 
   // Complete setup
@@ -225,18 +228,18 @@ export const rotationStateAPI = {
     checkSupabaseConfig();
 
     // Delete all purchases
-    const { error: purchasesError } = await supabase
+    const { error: purchasesError } = await supabase!
       .from('purchases')
       .delete()
-      .neq('id', '00000000-0000-0000-0000-000000000000'); // Delete all
+      .neq('id', '00000000-0000-0000-0000-000000000000' as any); // Delete all
 
     if (purchasesError) throw purchasesError;
 
     // Delete all family members
-    const { error: membersError } = await supabase
+    const { error: membersError } = await supabase!
       .from('family_members')
       .delete()
-      .neq('id', '00000000-0000-0000-0000-000000000000'); // Delete all
+      .neq('id', '00000000-0000-0000-0000-000000000000' as any); // Delete all
 
     if (membersError) throw membersError;
 
@@ -261,13 +264,16 @@ export const rotationStateAPI = {
   ): Promise<RotationStateDB> => {
     checkSupabaseConfig();
     
-    const { data: existingState, error: fetchError } = await supabase
+    const { data: existingState, error: fetchError } = await supabase!
       .from('rotation_state')
       .select('id')
       .single();
 
     if (fetchError) throw fetchError;
     if (!existingState) throw new Error('No rotation state found');
+
+    // Type assertion to help TypeScript understand existingState is not an error
+    const stateId = (existingState as { id: string }).id;
 
     // Get family member indices
     const familyMembers = await familyMembersAPI.getAll();
@@ -289,22 +295,22 @@ export const rotationStateAPI = {
       dry_food_last_purchased_by: dryLastBoughtBy,
     };
 
-    const { data, error } = await supabase
+    const { data, error } = await supabase!
       .from('rotation_state')
-      .update(updateData)
-      .eq('id', existingState.id)
+      .update(updateData as never)
+      .eq('id', stateId as any)
       .select()
       .single();
 
     if (error) throw error;
-    return data;
+    return data as unknown as RotationStateDB;
   },
 
   // Update just the current turn index for a specific food type
   updateTurnIndex: async (foodType: 'wet' | 'dry', memberIndex: number): Promise<RotationStateDB> => {
     checkSupabaseConfig();
     
-    const { data: existingState, error: fetchError } = await supabase
+    const { data: existingState, error: fetchError } = await supabase!
       .from('rotation_state')
       .select('id')
       .single();
@@ -312,19 +318,22 @@ export const rotationStateAPI = {
     if (fetchError) throw fetchError;
     if (!existingState) throw new Error('No rotation state found');
 
+    // Type assertion to help TypeScript understand existingState is not an error
+    const stateId = (existingState as { id: string }).id;
+
     const updateData: RotationStateUpdate = {
       [`${foodType}_food_current_index`]: memberIndex,
     };
 
-    const { data, error } = await supabase
+    const { data, error } = await supabase!
       .from('rotation_state')
-      .update(updateData)
-      .eq('id', existingState.id)
+      .update(updateData as never)
+      .eq('id', stateId as any)
       .select()
       .single();
 
     if (error) throw error;
-    return data;
+    return data as unknown as RotationStateDB;
   },
 
   // Reset both turns to first member

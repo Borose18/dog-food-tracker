@@ -114,18 +114,22 @@ export default function Home() {
                 />
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <FoodSection
-                    foodType="wet"
-                    foodStatus={state.wetFoodStatus}
-                    currentMember={wetFoodCurrentMember}
-                    onPurchase={recordPurchase}
-                  />
-                  <FoodSection
-                    foodType="dry"
-                    foodStatus={state.dryFoodStatus}
-                    currentMember={dryFoodCurrentMember}
-                    onPurchase={recordPurchase}
-                  />
+                  {wetFoodCurrentMember && (
+                    <FoodSection
+                      foodType="wet"
+                      foodStatus={state.wetFoodStatus}
+                      currentMember={wetFoodCurrentMember}
+                      onPurchase={recordPurchase}
+                    />
+                  )}
+                  {dryFoodCurrentMember && (
+                    <FoodSection
+                      foodType="dry"
+                      foodStatus={state.dryFoodStatus}
+                      currentMember={dryFoodCurrentMember}
+                      onPurchase={recordPurchase}
+                    />
+                  )}
                 </div>
               </div>
 
