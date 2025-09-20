@@ -151,6 +151,29 @@ export const useAppState = () => {
     localStorage.removeItem(STORAGE_KEY);
   }, []);
 
+  // Add missing functions for compatibility
+  const updateTurn = useCallback((foodType: 'wet' | 'dry', memberIndex: number) => {
+    setState(prev => ({
+      ...prev,
+      [`${foodType}FoodCurrentIndex`]: memberIndex,
+    }));
+  }, []);
+
+  const resetTurns = useCallback(() => {
+    setState(prev => ({
+      ...prev,
+      wetFoodCurrentIndex: 0,
+      dryFoodCurrentIndex: 0,
+    }));
+  }, []);
+
+  const lockTurns = useCallback(() => {
+    setState(prev => ({
+      ...prev,
+      turnsLocked: true,
+    }));
+  }, []);
+
   return {
     state,
     loading: false,
@@ -160,5 +183,8 @@ export const useAppState = () => {
     completeSetup,
     recordPurchase,
     resetApp,
+    updateTurn,
+    resetTurns,
+    lockTurns,
   };
 };
