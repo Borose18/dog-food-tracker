@@ -19,9 +19,15 @@ export default function Home() {
     isSupabaseConfigured ? supabaseHook : localStorageHook;
 
   // Get current members for wet and dry food separately
-  const wetFoodCurrentMember = state.familyMembers[state.wetFoodCurrentIndex];
-  const dryFoodCurrentMember = state.familyMembers[state.dryFoodCurrentIndex];
-  const wetFoodNextMember = state.familyMembers[(state.wetFoodCurrentIndex + 1) % state.familyMembers.length];
+  const wetFoodCurrentMember = state.familyMembers.length > 0 
+    ? state.familyMembers[state.wetFoodCurrentIndex] 
+    : undefined;
+  const dryFoodCurrentMember = state.familyMembers.length > 0 
+    ? state.familyMembers[state.dryFoodCurrentIndex] 
+    : undefined;
+  const wetFoodNextMember = state.familyMembers.length > 0 
+    ? state.familyMembers[(state.wetFoodCurrentIndex + 1) % state.familyMembers.length]
+    : undefined;
   
   // Keep backward compatibility for CurrentTurn component
   const currentMember = wetFoodCurrentMember; // Default to wet food for main display
